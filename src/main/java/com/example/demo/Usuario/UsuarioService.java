@@ -15,6 +15,10 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @PostConstruct
+    public void init() {
+        clearDatabase();
+    }
+
     public void clearDatabase() {
         usuarioRepository.deleteAll(); // Método para vaciar la tabla de usuario
         System.out.println("La tabla de usuario se ha vaciado.");

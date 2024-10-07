@@ -9,7 +9,6 @@ public class DatabaseCleanupService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     public void clearDatabase() {
         jdbcTemplate.execute("TRUNCATE TABLE Usuario");
     }
