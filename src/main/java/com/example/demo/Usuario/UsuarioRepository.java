@@ -1,8 +1,9 @@
 package com.example.demo.Usuario;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
-    Optional<Usuario> findByNombre(String nombre);
+    @Query(value = "TRUNCATE TABLE Usuario", nativeQuery = true)
+    void truncateTable();
 }

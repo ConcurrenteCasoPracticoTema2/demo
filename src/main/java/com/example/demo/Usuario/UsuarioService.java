@@ -6,11 +6,23 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @PostConstruct
+    public void init() {
+        clearDatabase();
+    }
+
+    public void clearDatabase() {
+        usuarioRepository.deleteAll(); // Método para vaciar la tabla de usuario
+        System.out.println("La tabla de usuario se ha vaciado.");
+    }
 
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();

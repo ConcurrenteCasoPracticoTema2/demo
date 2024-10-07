@@ -16,6 +16,10 @@ public class IQDataService {
     @Autowired
     private IQDataRepository iqDataRepository;
 
+    public void deleteAll() {
+        iqDataRepository.truncateTable();
+    }
+
     public void saveCSVData() {
         try {
             ClassPathResource resource = new ClassPathResource("IQ_level_limpio.csv");
