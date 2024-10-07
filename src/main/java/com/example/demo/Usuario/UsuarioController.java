@@ -1,5 +1,6 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.DatabaseCleanupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,9 +10,15 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-
+    @Autowired
+    private DatabaseCleanupService databaseCleanupService;
     @Autowired
     private UsuarioService usuarioService;
+
+    @PostMapping("/vaciar")
+    public void vaciarTabla() {
+        usuarioService.clearDatabase();
+    }
 
     @GetMapping
     public List<Usuario> getAllUsuarios() {
