@@ -1,53 +1,40 @@
 package com.example.demo.Usuario;
 
-import com.example.demo.LimpiezaBase.DatabaseCleanupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/usuarios")
+@Controller
 public class UsuarioController {
-    @Autowired
-    private DatabaseCleanupService databaseCleanupService;
+
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/vaciar")
-    public void vaciarTabla() {
-        usuarioService.clearDatabase();
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login";
     }
 
-    @GetMapping
-    public List<Usuario> getAllUsuarios() {
-        return usuarioService.getAllUsuarios();
-    }
-
-    @GetMapping("/{id}")
-    public Optional<Usuario> getUsuarioById(@PathVariable Integer id) {
-        return usuarioService.getUsuarioById(id);
-    }
-
-    @PostMapping
-    public Usuario createUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.createUsuario(usuario);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUsuario(@PathVariable Integer id) {
-        usuarioService.deleteUsuario(id);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestParam String nombre, @RequestParam String contraseña) {
-        Optional<Usuario> usuario = usuarioService.login(nombre, contraseña);
+    @PostMapping("/usuarios/login")
+    public String login(@RequestParam String username, @RequestParam String password, Model model) {
+        Optional<Usuario> usuario = usuarioService.login(username, password);
         if (usuario.isPresent()) {
-            return ResponseEntity.ok(usuario.get());
+            model.addAttribute("usuario", usuario.get());
+            return "welcome";
         } else {
-            return ResponseEntity.status(401).build();
+            model.addAttribute("error", "Invalid username or password");
+            return "login";
         }
+    }
+
+    @GetMapping("/usuarios")
+    public String getAllUsuarios(Model model) {
+        model.addAttribute("usuarios", usuarioService.getAllUsuarios());
+        return "usuarios";
     }
 }
