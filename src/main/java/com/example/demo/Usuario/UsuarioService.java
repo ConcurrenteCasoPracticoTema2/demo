@@ -1,16 +1,21 @@
 package com.example.demo.Usuario;
 
+import com.example.demo.IQ.IQDataService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private IQDataService iqDataService;
 
     public Optional<Usuario> login(String nombre, String contraseña) {
         return usuarioRepository.findByNombreAndContraseña(nombre, contraseña);
@@ -19,6 +24,8 @@ public class UsuarioService {
     @PostConstruct
     public void init() {
         clearDatabase();
+        iqDataService.deleteAll();
+        iqDataService.saveCSVData();
         createAdminUser();
         createDefaultUser();
     }

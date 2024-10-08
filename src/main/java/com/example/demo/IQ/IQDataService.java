@@ -17,7 +17,8 @@ public class IQDataService {
     private IQDataRepository iqDataRepository;
 
     public void deleteAll() {
-        iqDataRepository.truncateTable();
+        iqDataRepository.deleteAll();
+        System.out.println("La tabla iq_data se ha vaciado.");
     }
 
     public void saveCSVData() {
@@ -31,6 +32,7 @@ public class IQDataService {
                 while ((line = reader.readLine()) != null) {
                     String[] data = line.split(",");
                     IQData iqData = new IQData();
+                    iqData.setId(Long.parseLong(data[0])); // Set id to the same value as rank
                     iqData.setRank(Integer.parseInt(data[0]));
                     iqData.setCountry(data[1]);
                     iqData.setIQ(Integer.parseInt(data[2]));
@@ -40,6 +42,7 @@ public class IQDataService {
                     iqDataList.add(iqData);
                 }
                 iqDataRepository.saveAll(iqDataList);
+                System.out.println("La tabla iq_data se ha llenado.");
             }
         } catch (Exception e) {
             e.printStackTrace();
