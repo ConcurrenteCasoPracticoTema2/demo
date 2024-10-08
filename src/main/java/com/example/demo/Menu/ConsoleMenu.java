@@ -1,5 +1,5 @@
 package com.example.demo.Menu;
-
+/*
 import com.example.demo.Usuario.Usuario;
 import com.example.demo.Usuario.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,3 +52,5 @@ public class ConsoleMenu implements CommandLineRunner {
         scanner.close();
     }
 }
+
+ */
