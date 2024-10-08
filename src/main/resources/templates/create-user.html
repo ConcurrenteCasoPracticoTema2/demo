@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Create New User</title>
+    <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
-<h2>Create New User</h2>
-<form action="/create-user" method="post">
-    <label for="newUsername">New Username:</label>
-    <input type="text" id="newUsername" name="newUsername" required><br><br>
-    <label for="newPassword">New Password:</label>
-    <input type="password" id="newPassword" name="newPassword" required><br><br>
-    <button type="submit">Create User</button>
-</form>
+    <div class="login-box create-user-box">
+        <h2>Create New User</h2>
+        <form action="/create-user" method="post">
+            <div class="user-box">
+                <input type="text" id="newUsername" name="newUsername" required>
+                <label for="newUsername">New Username</label>
+            </div>
+            <div class="user-box">
+                <input type="password" id="newPassword" name="newPassword" required>
+                <label for="newPassword">New Password</label>
+            </div>
+            <a href="#" onclick="document.forms[0].submit(); return false;">Create User</a>
+        </form>
+    </div>
 </body>
 </html>
