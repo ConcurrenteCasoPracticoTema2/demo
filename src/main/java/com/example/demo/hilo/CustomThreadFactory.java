@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/hilo/CustomThreadFactory.java
 package com.example.demo.hilo;
 
 import java.util.concurrent.ThreadFactory;
@@ -8,6 +9,6 @@ public class CustomThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        return new Thread(r, "UserThread-" + counter.getAndIncrement());
+        return new Thread(r, "poolThread-" + counter.getAndIncrement());
     }
 }

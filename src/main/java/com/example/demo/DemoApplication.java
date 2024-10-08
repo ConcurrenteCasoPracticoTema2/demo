@@ -10,6 +10,9 @@ public class DemoApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
         AsyncService asyncService = context.getBean(AsyncService.class);
-        asyncService.printData();
+       // asyncService.printData();
+       // asyncService.printIQData();
+       // asyncService.printRow56();
+        //asyncService.printCountries();
     }
 }
