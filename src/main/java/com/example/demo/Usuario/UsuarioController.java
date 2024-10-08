@@ -1,6 +1,6 @@
 package com.example.demo.Usuario;
 
-import com.example.demo.DatabaseCleanupService;
+import com.example.demo.LimpiezaBase.DatabaseCleanupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
