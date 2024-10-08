@@ -22,11 +22,9 @@ public class Usuario {
     @Column(nullable = false)
     private boolean isAdmin;
 
-    // Constructor vacío (opcional)
     public Usuario() {
     }
 
-    // Constructor con parámetros (opcional)
     public Usuario(String nombre, String contraseña, boolean isAdmin) {
         this.nombre = nombre;
         this.contraseña = contraseña;
