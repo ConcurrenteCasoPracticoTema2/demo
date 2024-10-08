@@ -37,6 +37,19 @@ public class UsuarioController {
         }
     }
 
+    @GetMapping("/create-user-form")
+    public String showCreateUserForm() {
+        return "create-user";
+    }
+
+    @PostMapping("/create-user")
+    public String createUser(@RequestParam String newUsername, @RequestParam String newPassword, Model model) {
+        Usuario newUser = new Usuario(newUsername, newPassword, false);
+        usuarioService.createUsuario(newUser);
+        model.addAttribute("message", "User created successfully");
+        return "login";
+    }
+
     @GetMapping("/usuarios")
     public String getAllUsuarios(Model model) {
         model.addAttribute("usuarios", usuarioService.getAllUsuarios());
