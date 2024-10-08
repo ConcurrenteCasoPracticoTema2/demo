@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/LimpiezaBase/DatabaseCleanupService.java
 package com.example.demo.LimpiezaBase;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,8 @@ public class DatabaseCleanupService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     public void clearDatabase() {
-        jdbcTemplate.execute("TRUNCATE TABLE Usuario");
+        jdbcTemplate.execute("TRUNCATE TABLE usuario");
     }
 }
