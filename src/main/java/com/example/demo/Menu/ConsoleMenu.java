@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.Menu;
 
 import com.example.demo.Usuario.Usuario;
 import com.example.demo.Usuario.UsuarioService;
