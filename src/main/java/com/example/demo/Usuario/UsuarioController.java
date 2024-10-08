@@ -20,12 +20,17 @@ public class UsuarioController {
         return "login";
     }
 
-    @PostMapping("/usuarios/login")
+    @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, Model model) {
         Optional<Usuario> usuario = usuarioService.login(username, password);
         if (usuario.isPresent()) {
-            model.addAttribute("usuario", usuario.get());
-            return "welcome";
+            Usuario user = usuario.get();
+            model.addAttribute("usuario", user);
+            if (user.isAdmin()) {
+                return "admin";
+            } else {
+                return "user";
+            }
         } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";
