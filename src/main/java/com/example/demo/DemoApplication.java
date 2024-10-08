@@ -11,7 +11,7 @@ public class DemoApplication {
         ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
         AsyncService asyncService = context.getBean(AsyncService.class);
        // asyncService.printData();
-       // asyncService.printIQData();
+        asyncService.printIQData();
        // asyncService.printRow56();
         //asyncService.printCountries();
     }

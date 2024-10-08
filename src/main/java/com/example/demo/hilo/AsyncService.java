@@ -48,7 +48,7 @@ public class AsyncService {
 
     @Async("taskExecutor")
     public CompletableFuture<Void> printData() {
-        ExecutorService executor = Executors.newFixedThreadPool(30);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         List<Usuario> usuarios = Collections.synchronizedList(new ArrayList<>());
 
         // Submit only one task to fetch data
@@ -71,13 +71,20 @@ public class AsyncService {
 
     @Async("taskExecutor")
     public CompletableFuture<Void> printIQData() {
-        ExecutorService executor = Executors.newFixedThreadPool(30);
         List<IQData> iqDataList = iqDataRepository.findAll();
+        ExecutorService executor = Executors.newFixedThreadPool(10);
 
         for (IQData iqData : iqDataList) {
             executor.submit(() -> {
-                synchronized (iqData) {
-                    System.out.println(Thread.currentThread().getName() + " - ID: " + iqData.getId() + ", Rank: " + iqData.getRank() + ", Country: " + iqData.getCountry() + ", IQ: " + iqData.getIQ() + ", Education Expenditure: " + iqData.getEducationExpenditure() + ", Average Income: " + iqData.getAvgIncome() + ", Average Temperature: " + iqData.getAvgTemp());
+                try {
+                    semaphore.acquire();
+                    synchronized (iqData) {
+                        System.out.println(Thread.currentThread().getName() + " - ID: " + iqData.getId() + ", Rank: " + iqData.getRank() + ", Country: " + iqData.getCountry() + ", IQ: " + iqData.getIQ() + ", Education Expenditure: " + iqData.getEducationExpenditure() + ", Average Income: " + iqData.getAvgIncome() + ", Average Temperature: " + iqData.getAvgTemp());
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    semaphore.release();
                 }
             });
         }
