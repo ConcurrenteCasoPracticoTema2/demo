@@ -12,6 +12,7 @@ public class IQDataController {
 
     @PostMapping("/IQ_level_limpio.csv")
     public String uploadCSV() {
+        iqDataService.deleteAll(); // Delete all records before inserting new ones
         iqDataService.saveCSVData();
         return "File uploaded and data saved successfully!";
     }

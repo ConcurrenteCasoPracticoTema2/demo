@@ -1,7 +1,8 @@
 package com.example.demo.Usuario;
 
-import com.example.demo.DatabaseCleanupService;
+import com.example.demo.LimpiezaBase.DatabaseCleanupService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,5 +39,15 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable Integer id) {
         usuarioService.deleteUsuario(id);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> login(@RequestParam String nombre, @RequestParam String contraseña) {
+        Optional<Usuario> usuario = usuarioService.login(nombre, contraseña);
+        if (usuario.isPresent()) {
+            return ResponseEntity.ok(usuario.get());
+        } else {
+            return ResponseEntity.status(401).build();
+        }
     }
 }
