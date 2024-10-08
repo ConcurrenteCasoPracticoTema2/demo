@@ -8,7 +8,8 @@ import com.example.demo.Usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class AsyncService {
@@ -72,19 +74,22 @@ public class AsyncService {
     @Async("taskExecutor")
     public CompletableFuture<Void> printIQData() {
         List<IQData> iqDataList = iqDataRepository.findAll();
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        AtomicInteger index = new AtomicInteger(0);
+        Semaphore semaphore = new Semaphore(1);
 
-        for (IQData iqData : iqDataList) {
+        while (index.get() < iqDataList.size()) {
             executor.submit(() -> {
                 try {
                     semaphore.acquire();
-                    synchronized (iqData) {
+                    if (index.get() < iqDataList.size()) {
+                        IQData iqData = iqDataList.get(index.getAndIncrement());
                         System.out.println(Thread.currentThread().getName() + " - ID: " + iqData.getId() + ", Rank: " + iqData.getRank() + ", Country: " + iqData.getCountry() + ", IQ: " + iqData.getIQ() + ", Education Expenditure: " + iqData.getEducationExpenditure() + ", Average Income: " + iqData.getAvgIncome() + ", Average Temperature: " + iqData.getAvgTemp());
                     }
+                    semaphore.release();
+                    Thread.sleep(100); // Pause for 100 milliseconds
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                } finally {
-                    semaphore.release();
                 }
             });
         }
@@ -96,4 +101,35 @@ public class AsyncService {
 
         return CompletableFuture.completedFuture(null);
     }
+
+   /* @Async("taskExecutor")
+    public CompletableFuture<Void> printIQData() {
+        List<IQData> iqDataList = iqDataRepository.findAll();
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        AtomicInteger index = new AtomicInteger(0);
+
+        while (index.get() < iqDataList.size()) {
+            executor.submit(() -> {
+                try {
+                    semaphore.acquire();
+                    if (index.get() < iqDataList.size()) {
+                        IQData iqData = iqDataList.get(index.getAndIncrement());
+                        System.out.println(Thread.currentThread().getName() + " - ID: " + iqData.getId() + ", Rank: " + iqData.getRank() + ", Country: " + iqData.getCountry() + ", IQ: " + iqData.getIQ() + ", Education Expenditure: " + iqData.getEducationExpenditure() + ", Average Income: " + iqData.getAvgIncome() + ", Average Temperature: " + iqData.getAvgTemp());
+                    }
+                    semaphore.release();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+            // Wait for all threads to finish
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    */
 }
