@@ -46,33 +46,6 @@ public class ExecutorServiceTask {
         }
     }
 
-    public void printRow56() {
-        IQData iqData = iqDataRepository.findById(56L).orElse(null);
-        singleThreadExecutor.submit(() -> {
-            if (iqData != null) {
-                System.out.println(Thread.currentThread().getName() + " - ID: " + iqData.getId() + ", Rank: " + iqData.getRank() + ", Country: " + iqData.getCountry() + ", IQ: " + iqData.getIQ() + ", Education Expenditure: " + iqData.getEducationExpenditure() + ", Average Income: " + iqData.getAvgIncome() + ", Average Temperature: " + iqData.getAvgTemp());
-            } else {
-                System.out.println("No data found for ID 56");
-            }
-        });
-    }
-
-    public void printData() {
-        List<Usuario> usuarios = Collections.synchronizedList(new ArrayList<>());
-
-        singleThreadExecutor.submit(new UsuarioProcessingTask(usuarioRepository, usuarios));
-
-        while (!singleThreadExecutor.isTerminated()) {
-            // Esperar a que termine el hilo
-        }
-
-        synchronized (usuarios) {
-            for (Usuario usuario : usuarios) {
-                System.out.println(Thread.currentThread().getName() + " - ID: " + usuario.getId() + ", Nombre: " + usuario.getNombre() + ", Contraseña: " + usuario.getContraseña() + ", Admin: " + usuario.isAdmin());
-            }
-        }
-    }
-
     public void printIQData() {
         List<IQData> iqDataList = iqDataRepository.findAll();
         AtomicInteger index = new AtomicInteger(0);
