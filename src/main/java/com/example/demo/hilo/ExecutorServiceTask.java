@@ -6,7 +6,6 @@ import com.example.demo.Usuario.Usuario;
 import com.example.demo.Usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +36,6 @@ public class ExecutorServiceTask {
 
     Semaphore semaphore = new Semaphore(1);
 
-    // Ahora usamos el ExecutorService inyectado
     public void printCountries() {
         List<IQData> iqDataList = iqDataRepository.findAll();
         for (IQData iqData : iqDataList) {
@@ -45,7 +43,6 @@ public class ExecutorServiceTask {
                 System.out.println(Thread.currentThread().getName() + " - Country: " + iqData.getCountry());
             });
         }
-        fixedThreadPool.shutdown();  // Cerramos el pool cuando todas las tareas hayan terminado
     }
 
     public void printRow56() {
@@ -62,15 +59,12 @@ public class ExecutorServiceTask {
     public void printData() {
         List<Usuario> usuarios = Collections.synchronizedList(new ArrayList<>());
 
-        // Ejecutamos en un solo hilo usando singleThreadExecutor
         singleThreadExecutor.submit(new UsuarioProcessingTask(usuarioRepository, usuarios));
 
-        singleThreadExecutor.shutdown();
         while (!singleThreadExecutor.isTerminated()) {
             // Esperar a que termine el hilo
         }
 
-        // Imprimimos los usuarios
         synchronized (usuarios) {
             for (Usuario usuario : usuarios) {
                 System.out.println(Thread.currentThread().getName() + " - ID: " + usuario.getId() + ", Nombre: " + usuario.getNombre() + ", Contraseña: " + usuario.getContraseña() + ", Admin: " + usuario.isAdmin());
@@ -83,7 +77,7 @@ public class ExecutorServiceTask {
         AtomicInteger index = new AtomicInteger(0);
 
         while (index.get() < iqDataList.size()) {
-            customThreadPool.submit(() -> {
+            fixedThreadPool2.submit(() -> {
                 try {
                     semaphore.acquire();
                     if (index.get() < iqDataList.size()) {
@@ -97,10 +91,11 @@ public class ExecutorServiceTask {
                 }
             });
         }
+    }
 
-        customThreadPool.shutdown();
-        while (!customThreadPool.isTerminated()) {
-            // Esperar a que todas las tareas terminen
-        }
+    public void shutdownExecutors() {
+        fixedThreadPool.shutdown();
+        singleThreadExecutor.shutdown();
+        fixedThreadPool2.shutdown();
     }
 }
