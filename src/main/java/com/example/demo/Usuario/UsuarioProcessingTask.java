@@ -1,8 +1,5 @@
 // src/main/java/com/example/demo/hilo/UsuarioProcessingTask.java
-package com.example.demo.hilo;
-
-import com.example.demo.Usuario.Usuario;
-import com.example.demo.Usuario.UsuarioRepository;
+package com.example.demo.Usuario;
 
 import java.util.List;
 

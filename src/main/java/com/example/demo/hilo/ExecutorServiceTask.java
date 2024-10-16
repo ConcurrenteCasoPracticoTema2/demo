@@ -3,6 +3,7 @@ package com.example.demo.hilo;
 import com.example.demo.IQ.IQData;
 import com.example.demo.IQ.IQDataRepository;
 import com.example.demo.Usuario.Usuario;
+import com.example.demo.Usuario.UsuarioProcessingTask;
 import com.example.demo.Usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
