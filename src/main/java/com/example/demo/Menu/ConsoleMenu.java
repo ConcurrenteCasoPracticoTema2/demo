@@ -17,14 +17,14 @@ public class ConsoleMenu implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Create default user
         usuarioService.createDefaultUser();
 
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
             System.out.println("1. Login");
-            System.out.println("2. Exit");
+            System.out.println("2. Register");
+            System.out.println("3. Exit");
             System.out.print("Choose an option: ");
             int option = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -42,6 +42,15 @@ public class ConsoleMenu implements CommandLineRunner {
                     System.out.println("Invalid username or password.");
                 }
             } else if (option == 2) {
+                System.out.print("Enter new username: ");
+                String nombre = scanner.nextLine();
+                System.out.print("Enter new password: ");
+                String contraseña = scanner.nextLine();
+
+                Usuario newUser = new Usuario(nombre, contraseña, false);
+                usuarioService.createUsuario(newUser);
+                System.out.println("User registered successfully!");
+            } else if (option == 3) {
                 System.out.println("Exiting...");
                 break;
             } else {

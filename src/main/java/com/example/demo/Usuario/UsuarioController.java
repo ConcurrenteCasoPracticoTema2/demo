@@ -12,6 +12,7 @@ import java.util.Optional;
 @RequestMapping("/usuarios")
 public class UsuarioController {
     @Autowired
+
     private DatabaseCleanupService databaseCleanupService;
     @Autowired
     private UsuarioService usuarioService;
