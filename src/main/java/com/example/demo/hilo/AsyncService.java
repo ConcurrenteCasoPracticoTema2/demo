@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/hilo/AsyncService.java
 package com.example.demo.hilo;
 
 import com.example.demo.IQ.IQData;
@@ -8,12 +7,12 @@ import com.example.demo.Usuario.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,14 +25,21 @@ public class AsyncService {
     @Autowired
     private IQDataRepository iqDataRepository;
 
+    @Autowired
+    private ExecutorServiceFactory executorServiceFactory;
+
     Semaphore semaphore = new Semaphore(1);
 
     @Async("taskExecutor")
     public void printCountries() {
         List<IQData> iqDataList = iqDataRepository.findAll();
+        ExecutorService executor = executorServiceFactory.createFixedThreadPool(5);
         for (IQData iqData : iqDataList) {
-            System.out.println(Thread.currentThread().getName() + " - Country: " + iqData.getCountry());
+            executor.submit(() -> {
+                System.out.println(Thread.currentThread().getName() + " - Country: " + iqData.getCountry());
+            });
         }
+        executor.shutdown();
     }
 
     @Async("taskExecutor")
@@ -48,7 +54,7 @@ public class AsyncService {
 
     @Async("taskExecutor")
     public CompletableFuture<Void> printData() {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ExecutorService executor = executorServiceFactory.createSingleThreadExecutor();
         List<Usuario> usuarios = Collections.synchronizedList(new ArrayList<>());
 
         // Submit only one task to fetch data
@@ -72,9 +78,8 @@ public class AsyncService {
     @Async("taskExecutor")
     public CompletableFuture<Void> printIQData() {
         List<IQData> iqDataList = iqDataRepository.findAll();
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = executorServiceFactory.createCustomThreadPool(10);
         AtomicInteger index = new AtomicInteger(0);
-        Semaphore semaphore = new Semaphore(1);
 
         while (index.get() < iqDataList.size()) {
             executor.submit(() -> {

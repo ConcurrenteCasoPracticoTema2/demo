@@ -1,4 +1,3 @@
-// src/main/java/com/example/demo/hilo/AsyncConfiguration.java
 package com.example.demo.hilo;
 
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,6 @@ public class AsyncConfiguration {
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(100);
-        executor.setThreadFactory(new CustomThreadFactory());
         executor.initialize();
         return executor;
     }
