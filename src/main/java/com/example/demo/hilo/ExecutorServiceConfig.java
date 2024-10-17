@@ -14,6 +14,10 @@ public class ExecutorServiceConfig {
     public ExecutorService fixedThreadPool() {
         return Executors.newFixedThreadPool(5);  // Crea un pool fijo de 5 hilos
     }
+    @Bean(name = "fixedThreadPool2")
+    public ExecutorService fixedThreadPool2() {
+        return Executors.newFixedThreadPool(8); // Crea un pool fijo de 5 hilos
+    }
 
     @Bean(name = "singleThreadExecutor")
     public ExecutorService singleThreadExecutor() {

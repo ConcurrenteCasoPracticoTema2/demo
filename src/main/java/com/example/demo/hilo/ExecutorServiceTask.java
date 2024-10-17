@@ -28,6 +28,8 @@ public class ExecutorServiceTask {
 
     @Autowired
     private ExecutorService fixedThreadPool;
+    @Autowired
+    private ExecutorService fixedThreadPool2;
 
     @Autowired
     private ExecutorService singleThreadExecutor;
