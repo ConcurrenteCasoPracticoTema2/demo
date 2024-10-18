@@ -3,20 +3,21 @@ package com.example.demo.Menu;
 import com.example.demo.Usuario.Usuario;
 import com.example.demo.Usuario.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Scanner;
 
 @Component
-public class ConsoleMenu implements CommandLineRunner {
+public class ConsoleMenu implements Runnable {
 
     @Autowired
     private UsuarioService usuarioService;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run() {
+        System.out.println(Thread.currentThread().getName()); // Print the current thread name
+
         usuarioService.createDefaultUser();
 
         Scanner scanner = new Scanner(System.in);

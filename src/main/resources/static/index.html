@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfica</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css">
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+</head>
+<body>
+<h1>Visualización de Datos</h1>
+<py-script>
+    import matplotlib.pyplot as plt
+    import js
+    import random
+
+    data = [random.randint(80, 120) for _ in range(10)]
+    countries = ["Country " + str(i) for i in range(10)]
+
+    plt.bar(countries, data)
+    plt.title("IQ por País")
+    plt.ylabel("IQ")
+    plt.xticks(rotation=45, ha="right")
+
+    # Mostrar gráfica en el frontend
+    js.document.body.innerHTML += "<img src='data:image/png;base64," + plt_to_base64(plt) + "' />"
+
+</py-script>
+</body>
+</html>
