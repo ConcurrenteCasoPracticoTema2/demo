@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countries and Ranks Data Stream</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+        .bar:hover {
+            fill: orange;
+        }
+        .axis-label {
+            font-size: 12px;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 5px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Countries and Ranks Data Stream</h1>
+<div id="chart"></div>
+<div id="tooltip" class="tooltip" style="opacity:0;"></div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const eventSource = new EventSource('/countries-ranks/stream');
+        const data = [];
+
+        eventSource.onmessage = function(event) {
+            const parsedData = JSON.parse(event.data);
+            data.push(parsedData);
+            createBarChart(data);
+        };
+
+        eventSource.onerror = function() {
+            console.log("Error in SSE connection.");
+            eventSource.close();
+        };
+
+        function createBarChart(data) {
+            // Set dimensions and margins for the chart
+            const margin = { top: 20, right: 30, bottom: 40, left: 90 };
+            const width = 1600 - margin.left - margin.right;
+            const height = 1200 - margin.top - margin.bottom;
+
+            // Clear any existing SVG elements
+            d3.select("#chart").selectAll("*").remove();
+
+            // Append the svg object to the body of the page
+            const svg = d3.select("#chart").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // X axis
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.Rank)])
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("class", "axis-label");
+
+            // Y axis
+            const y = d3.scaleBand()
+                .range([0, height])
+                .domain(data.map((d, i) => i))
+                .padding(.1);
+            svg.append("g")
+                .call(d3.axisLeft(y).tickFormat((d, i) => data[i].Country))
+                .selectAll("text")
+                .attr("class", "axis-label");
+
+            // Tooltip
+            const tooltip = d3.select("#tooltip");
+
+            // Bars
+            svg.selectAll("rect")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("x", x(0))
+                .attr("y", (d, i) => y(i))
+                .attr("width", d => x(d.Rank))
+                .attr("height", y.bandwidth())
+                .attr("class", "bar")
+                .on("mouseover", function(event, d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html("Thread: " + d.Thread)
+                        .style("left", (event.pageX + 5) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+        }
+    });
+</script>
+</body>
+</html>

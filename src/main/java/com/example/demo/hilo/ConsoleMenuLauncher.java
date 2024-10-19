@@ -28,7 +28,7 @@ public class ConsoleMenuLauncher {
     }
 
     private void openBrowser() {
-        String url = "http://localhost:8080/"; // Cambiar la URL para que apunte a la ruta correcta
+        String url = "http://localhost:8080/menu.html"; // Cambiar la URL para que apunte a la ruta correcta
         Runtime runtime = Runtime.getRuntime();
         try {
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
