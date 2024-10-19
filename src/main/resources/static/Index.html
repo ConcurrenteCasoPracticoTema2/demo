@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización con SSE</title>
+</head>
+<body>
+<h1>Datos recibidos desde el servidor:</h1>
+<div id="data-container"></div>
+
+<script>
+    // Establecer conexión SSE al SSEController
+    const eventSource = new EventSource('/stream-sse');
+
+    // Escuchar mensajes que el servidor envía
+    eventSource.onmessage = function(event) {
+        const newData = event.data;  // Datos enviados por el servidor
+
+        // Mostrar los datos en el contenedor
+        const container = document.getElementById('data-container');
+        container.innerHTML += `<p>${newData}</p>`;
+    };
+
+    // Manejar errores
+    eventSource.onerror = function() {
+        console.error('Error en la conexión SSE');
+    };
+</script>
+</body>
+</html>
