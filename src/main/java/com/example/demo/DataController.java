@@ -28,4 +28,18 @@ public class DataController {
 
         return emitter;
     }
+@GetMapping("/countries-ranks/stream")
+public SseEmitter streamCountriesAndRanks() {
+    SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutos
+
+    new Thread(() -> {
+        try {
+            executorServiceTask.printCountriesAndRanksWithEmitter(emitter);
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+        }
+    }).start();
+
+    return emitter;
+}
 }

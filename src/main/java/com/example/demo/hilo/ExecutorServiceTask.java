@@ -87,6 +87,42 @@ public class ExecutorServiceTask {
             emitter.completeWithError(e);
         }
     }
+   public void printCountriesAndRanksWithEmitter(SseEmitter emitter) {
+    List<IQData> iqDataList = iqDataRepository.findAll();
+    AtomicInteger index = new AtomicInteger(0);
+    CountDownLatch latch = new CountDownLatch(iqDataList.size());
+
+    while (index.get() < iqDataList.size()) {
+        fixedThreadPool2.submit(() -> {
+            try {
+                semaphore.acquire();
+
+                if (index.get() < iqDataList.size()) {
+                    IQData iqData = iqDataList.get(index.getAndIncrement());
+                    String threadName = Thread.currentThread().getName();
+                    String iqDataInfo = "{\"Country\": \"" + iqData.getCountry() + "\", \"Rank\": " + iqData.getRank() + ", \"Thread\": \"" + threadName + "\"}";
+                    emitter.send(iqDataInfo);
+                    System.out.println(iqDataInfo);
+                }
+
+                semaphore.release();
+                Thread.sleep(100);
+
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            } finally {
+                latch.countDown();
+            }
+        });
+    }
+
+    try {
+        latch.await();
+        emitter.complete();
+    } catch (InterruptedException e) {
+        emitter.completeWithError(e);
+    }
+}
 
     /**
      * Método auxiliar que imprime los países asociados a los IQData, ejecutado en paralelo.
