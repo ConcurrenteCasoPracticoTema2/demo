@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countries and Ranks Data Stream</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+        * {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            background-repeat: no-repeat;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .info h2 {
+            padding-top: 30px;
+            font-weight: 300;
+        }
+
+        .info p {
+            font-size: 18px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .signupForm h2 {
+            font-weight: 300;
+        }
+
+        .inputFields {
+            margin: 15px;
+            font-size: 16px;
+            padding: 10px;
+            width: 300px;
+            border: 1px solid rgba(10, 180, 180, 1);
+            background-color: #1f2023;
+            color: white;
+            outline: none;
+            border-radius: 5px;
+            position: sticky;
+        }
+
+        .buttonContainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: #121315;
+            z-index: 1;
+        }
+
+        .iqData {
+            color: white;
+        }
+
+        .stopThreadsButton {
+            background-color: #974444;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+        .bar:hover {
+            fill: orange;
+        }
+        .axis-label {
+            font-size: 12px;
+            fill: white;
+        }
+        .axis path,
+        .axis line {
+            stroke: white;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 5px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .title {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<video autoplay muted loop class="video-background">
+    <source src="video/background.mp4" type="video/mp4">
+    Tu navegador no soporta el elemento de video.
+</video>
+<h1 class="title">Countries and Ranks Data Stream</h1>
+<div id="chart"></div>
+<div id="tooltip" class="tooltip" style="opacity:0;"></div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const eventSource = new EventSource('/countries-ranks/stream');
+        const data = [];
+
+        eventSource.onmessage = function(event) {
+            const parsedData = JSON.parse(event.data);
+            data.push(parsedData);
+            createBarChart(data);
+        };
+
+        eventSource.onerror = function() {
+            console.log("Error in SSE connection.");
+            eventSource.close();
+        };
+
+        function createBarChart(data) {
+            // Set dimensions and margins for the chart
+            const margin = { top: 20, right: 30, bottom: 40, left: 90 };
+            const width = 1600 - margin.left - margin.right;
+            const height = 1200 - margin.top - margin.bottom;
+
+            // Clear any existing SVG elements
+            d3.select("#chart").selectAll("*").remove();
+
+            // Append the svg object to the body of the page
+            const svg = d3.select("#chart").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // X axis
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.Rank)])
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .attr("class", "axis")
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("class", "axis-label");
+
+            // Y axis
+            const y = d3.scaleBand()
+                .range([0, height])
+                .domain(data.map((d, i) => i))
+                .padding(.1);
+            svg.append("g")
+                .attr("class", "axis")
+                .call(d3.axisLeft(y).tickFormat((d, i) => data[i].Country))
+                .selectAll("text")
+                .attr("class", "axis-label");
+
+            // Tooltip
+            const tooltip = d3.select("#tooltip");
+
+            // Bars
+            svg.selectAll("rect")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("x", x(0))
+                .attr("y", (d, i) => y(i))
+                .attr("width", 0) // Start with width 0 for animation
+                .attr("height", y.bandwidth())
+                .attr("class", "bar")
+                .on("mouseover", function(event, d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html("Thread: " + d.Thread + "<br/>Rank: " + d.Rank)
+                        .style("left", (event.pageX + 5) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                })
+                .transition() // Add transition for the bars
+                .duration(1000)
+                .attr("width", d => x(d.Rank));
+        }
+    });
+</script>
+</body>
+</html>

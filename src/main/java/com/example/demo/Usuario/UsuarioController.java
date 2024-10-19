@@ -12,7 +12,6 @@ import java.util.Optional;
 @RequestMapping("/usuarios")
 public class UsuarioController {
     @Autowired
-
     private DatabaseCleanupService databaseCleanupService;
     @Autowired
     private UsuarioService usuarioService;
@@ -50,5 +49,11 @@ public class UsuarioController {
         } else {
             return ResponseEntity.status(401).build();
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Usuario> register(@RequestParam String nombre, @RequestParam String contraseña) {
+        Usuario newUser = usuarioService.registerUsuario(nombre, contraseña);
+        return ResponseEntity.ok(newUser);
     }
 }

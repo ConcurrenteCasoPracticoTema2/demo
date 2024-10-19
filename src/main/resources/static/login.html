@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300">
+    <style>
+        * {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #111;
+            background-repeat: no-repeat;
+        }
+
+        .signupSection {
+            background: url(https://source.unsplash.com/TV2gg2kZD1o/1600x800);
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 900px;
+            height: 500px;
+            text-align: center;
+            display: flex;
+            color: white;
+            box-shadow: 3px 10px 20px 5px rgba(0, 0, 0, .5);
+        }
+
+        .info {
+            width: 40%;
+            background: rgba(20, 20, 20, .8);
+            padding: 30px 0;
+            border-right: 5px solid rgba(30, 30, 30, .8);
+        }
+
+        .info h2 {
+            padding-top: 30px;
+            font-weight: 300;
+        }
+
+        .info p {
+            font-size: 18px;
+        }
+
+        .info .icon {
+            font-size: 8em;
+            padding: 20px 0;
+            color: rgba(10, 180, 180, 1);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .signupForm {
+            width: 60%;
+            padding: 30px 0;
+            background: rgba(20, 40, 40, .8);
+            transition: .2s;
+        }
+
+        .signupForm h2 {
+            font-weight: 300;
+        }
+
+        .inputFields {
+            margin: 15px 0;
+            font-size: 16px;
+            padding: 10px;
+            width: 300px;
+            border: 1px solid rgba(10, 180, 180, 1);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            background: rgba(20, 20, 20, .2);
+            color: white;
+            outline: none;
+        }
+
+        .noBullet {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .btn {
+            border: 1px solid rgba(10, 180, 180, 1);
+            background: rgba(20, 20, 20, .6);
+            font-size: 18px;
+            color: white;
+            margin-top: 20px;
+            padding: 10px 50px;
+            cursor: pointer;
+            transition: .4s;
+        }
+
+        .btn:hover {
+            background: rgba(20, 20, 20, .8);
+            padding: 10px 80px;
+        }
+
+        .formContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .registerLink {
+            margin-top: 20px;
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            border: 1px solid rgba(10, 180, 180, 1);
+            padding: 10px 50px;
+            background: rgba(20, 20, 20, .6);
+            transition: .4s;
+        }
+
+        .registerLink:hover {
+            background: rgba(20, 20, 20, .8);
+            padding: 10px 80px;
+        }
+
+        .orText {
+            margin: 20px 0;
+            font-size: 18px;
+            color: white;
+        }
+    </style>
+    <script>
+        function redirectToMenu(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = 'menu.html';
+                } else {
+                    alert('Error al iniciar sesión');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Error al iniciar sesión');
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="signupSection">
+    <div class="info">
+        <h2>Bienvenido</h2>
+        <p>Por favor, inicia sesión para continuar.</p>
+        <div class="icon">&#129504;</div>
+    </div>
+    <div class="signupForm">
+        <h2>Login</h2>
+        <form action="/usuarios/login" method="post" onsubmit="redirectToMenu(event)">
+            <div class="formContainer">
+                <input type="text" id="nombre" name="nombre" class="inputFields" placeholder="Nombre de usuario" required>
+                <input type="password" id="contraseña" name="contraseña" class="inputFields" placeholder="Contraseña" required>
+                <button type="submit" class="btn">Iniciar sesión</button>
+                <p class="orText">o</p>
+                <a href="registro.html" class="registerLink">Registrarse</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
