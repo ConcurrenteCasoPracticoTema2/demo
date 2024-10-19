@@ -14,10 +14,8 @@ public class DataController {
 
     @GetMapping("/iqdata/stream")
     public SseEmitter streamIQData() {
-        // Crear un emisor SSE con un tiempo de espera largo (por ejemplo, 30 minutos)
-        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutos
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutes
 
-        // Ejecutar el método que envía los datos IQ con el emisor
         new Thread(() -> {
             try {
                 executorServiceTask.printIQDataWithEmitter(emitter);
@@ -28,18 +26,34 @@ public class DataController {
 
         return emitter;
     }
-@GetMapping("/countries-ranks/stream")
-public SseEmitter streamCountriesAndRanks() {
-    SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutos
 
-    new Thread(() -> {
-        try {
-            executorServiceTask.printCountriesAndRanksWithEmitter(emitter);
-        } catch (Exception e) {
-            emitter.completeWithError(e);
-        }
-    }).start();
+    @GetMapping("/countries-ranks/stream")
+    public SseEmitter streamCountriesAndRanks() {
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutes
 
-    return emitter;
-}
+        new Thread(() -> {
+            try {
+                executorServiceTask.printCountriesAndRanksWithEmitter(emitter);
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }).start();
+
+        return emitter;
+    }
+
+    @GetMapping("/countries-iq-temp/stream")
+    public SseEmitter streamCountriesIQAndTemp() {
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30 minutes
+
+        new Thread(() -> {
+            try {
+                executorServiceTask.printCountriesIQAndTempWithEmitter(emitter);
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }).start();
+
+        return emitter;
+    }
 }
