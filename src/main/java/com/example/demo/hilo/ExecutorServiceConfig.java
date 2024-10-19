@@ -23,12 +23,10 @@ public class ExecutorServiceConfig {
     public ExecutorService singleThreadExecutor() {
         return Executors.newSingleThreadExecutor();  // Crea un pool de un solo hilo
     }
-
     @Bean(name = "customThreadPool")
     public ExecutorService customThreadPool() {
         return Executors.newCachedThreadPool();  // Crea un pool de hilos segÃºn demanda
     }
-
     @Bean(name = "fixedThreadPool3") // pull que no se ha comiteado
     public ExecutorService fixedThreadPool3() {
         return Executors.newFixedThreadPool(8); // Crea un pool fijo de 5 hilos

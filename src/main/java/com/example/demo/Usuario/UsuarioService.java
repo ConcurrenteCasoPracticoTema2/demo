@@ -28,31 +28,17 @@ public class UsuarioService {
         iqDataService.deleteAll();
         iqDataService.saveCSVData();
         createAdminUser();
-        createDefaultUser();
     }
 
     public void clearDatabase() {
         usuarioRepository.deleteAll();
         System.out.println("La tabla de usuario se ha vaciado.");
     }
-
     public void createAdminUser() {
         Usuario adminUser = new Usuario("admin", "admin", true);
         usuarioRepository.save(adminUser);
         System.out.println("Usuario administrador creado: admin");
     }
-
-    public void createDefaultUser() {
-        Optional<Usuario> existingUser = usuarioRepository.findByNombreAndContraseña("1", "1");
-        if (existingUser.isEmpty()) {
-            Usuario defaultUser = new Usuario("1", "1", false);
-            usuarioRepository.save(defaultUser);
-            System.out.println("Usuario por defecto creado: username=1, password=1");
-        } else {
-            System.out.println("El usuario por defecto ya existe.");
-        }
-    }
-
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
