@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countries and Ranks Data Stream</title>
+    <title>Countries IQ and AvgTemp Scatter Plot</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .hidden {
@@ -16,7 +16,7 @@
         body {
             margin: 0;
             padding: 0;
-            background: #111;
+            background: #121315;
             background-repeat: no-repeat;
         }
 
@@ -75,7 +75,7 @@
             align-items: center;
             position: sticky;
             top: 0;
-            background-color: #121315;
+            background-color: #1f2023;
             z-index: 1;
         }
 
@@ -87,19 +87,9 @@
             background-color: #974444;
         }
 
-        .bar {
-            fill: steelblue;
-        }
-        .bar:hover {
-            fill: orange;
-        }
         .axis-label {
             font-size: 12px;
-            fill: white;
-        }
-        .axis path,
-        .axis line {
-            stroke: white;
+            fill: transparent; /* Hacer el texto de las etiquetas transparente */
         }
         .tooltip {
             position: absolute;
@@ -113,8 +103,32 @@
             border-radius: 8px;
             pointer-events: none;
         }
+        .grid line {
+            stroke: white;
+            stroke-opacity: 0.7;
+            shape-rendering: crispEdges;
+        }
+        .grid path {
+            stroke-width: 0;
+        }
         .title {
             color: white;
+        }
+
+        /* Cambiar el color de los valores del eje X y del eje Y y las lÃ­neas de los ejes a blanco */
+        .axis-label, .grid line, .grid path, .tick text {
+            fill: transparent; /* Hacer el texto de las etiquetas transparente */
+            stroke: white;
+        }
+
+        /* Cambiar el color de los ejes X e Y a blanco */
+        .axis path,
+        .axis line {
+            stroke: white;
+        }
+
+        .axis text {
+            fill: transparent; /* Hacer el texto de las etiquetas transparente */
         }
     </style>
 </head>
@@ -123,18 +137,29 @@
     <source src="video/background.mp4" type="video/mp4">
     Tu navegador no soporta el elemento de video.
 </video>
-<h1 class="title">Countries and Ranks Data Stream</h1>
+<h1 class="title">Countries IQ and AvgTemp Scatter Plot</h1>
 <div id="chart"></div>
 <div id="tooltip" class="tooltip" style="opacity:0;"></div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const eventSource = new EventSource('/countries-ranks/stream');
+        const eventSource = new EventSource('/countries-iq-temp/stream');
         const data = [];
+        const countryFlags = {};
+
+        // Fetch country flags from restcountries.com API
+        fetch('https://restcountries.com/v3.1/all')
+            .then(response => response.json())
+            .then(countries => {
+                countries.forEach(country => {
+                    countryFlags[country.name.common] = country.flags.png;
+                });
+            })
+            .catch(error => console.error('Error fetching country flags:', error));
 
         eventSource.onmessage = function(event) {
             const parsedData = JSON.parse(event.data);
             data.push(parsedData);
-            createBarChart(data);
+            createScatterPlot(data);
         };
 
         eventSource.onerror = function() {
@@ -142,11 +167,11 @@
             eventSource.close();
         };
 
-        function createBarChart(data) {
+        function createScatterPlot(data) {
             // Set dimensions and margins for the chart
-            const margin = { top: 20, right: 30, bottom: 40, left: 90 };
-            const width = 1600 - margin.left - margin.right;
-            const height = 1200 - margin.top - margin.bottom;
+            const margin = { top: 20, right: 30, bottom: 60, left: 70 };
+            const width = 2200 - margin.left - margin.right; // Increased width
+            const height = 1000 - margin.top - margin.bottom; // Increased height
 
             // Clear any existing SVG elements
             d3.select("#chart").selectAll("*").remove();
@@ -160,55 +185,81 @@
 
             // X axis
             const x = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.Rank)])
+                .domain([d3.min(data, d => d.IQ) - 5, d3.max(data, d => d.IQ) + 5])
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", `translate(0,${height})`)
-                .attr("class", "axis")
                 .call(d3.axisBottom(x))
                 .selectAll("text")
                 .attr("class", "axis-label");
 
             // Y axis
-            const y = d3.scaleBand()
-                .range([0, height])
-                .domain(data.map((d, i) => i))
-                .padding(.1);
+            const y = d3.scaleLinear()
+                .domain([d3.min(data, d => d.AvgTemp) - 5, d3.max(data, d => d.AvgTemp) + 5])
+                .range([height, 0]);
             svg.append("g")
-                .attr("class", "axis")
-                .call(d3.axisLeft(y).tickFormat((d, i) => data[i].Country))
+                .call(d3.axisLeft(y))
                 .selectAll("text")
                 .attr("class", "axis-label");
+
+            // Add X gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x)
+                    .tickSize(-height)
+                    .tickFormat(""));
+
+            // Add Y gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .call(d3.axisLeft(y)
+                    .tickSize(-width)
+                    .tickFormat(""));
+
+            // Add X axis label
+            svg.append("text")
+                .attr("class", "axis-label")
+                .attr("text-anchor", "end")
+                .attr("x", width / 2)
+                .attr("y", height + margin.bottom - 10)
+                .text("IQ");
+
+            // Add Y axis label
+            svg.append("text")
+                .attr("class", "axis-label")
+                .attr("text-anchor", "end")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -margin.left + 20)
+                .text("Average Temperature");
 
             // Tooltip
             const tooltip = d3.select("#tooltip");
 
-            // Bars
-            svg.selectAll("rect")
+            // Dots with country flags
+            svg.selectAll("image")
                 .data(data)
                 .enter()
-                .append("rect")
-                .attr("x", x(0))
-                .attr("y", (d, i) => y(i))
-                .attr("width", 0) // Start with width 0 for animation
-                .attr("height", y.bandwidth())
-                .attr("class", "bar")
+                .append("image")
+                .attr("xlink:href", d => countryFlags[d.Country] || 'default_flag.png')
+                .attr("x", d => x(d.IQ) - 15) // Adjust position to center the image
+                .attr("y", d => y(d.AvgTemp) - 15) // Adjust position to center the image
+                .attr("width", 30) // Increase size of the dots
+                .attr("height", 30) // Increase size of the dots
                 .on("mouseover", function(event, d) {
                     tooltip.transition()
                         .duration(200)
                         .style("opacity", .9);
-                    tooltip.html("Thread: " + d.Thread + "<br/>Rank: " + d.Rank)
+                    tooltip.html("Country: " + d.Country + "<br/>IQ: " + d.IQ + "<br/>AvgTemp: " + d.AvgTemp + "<br/>Thread: " + d.Thread)
                         .style("left", (event.pageX + 5) + "px")
                         .style("top", (event.pageY - 28) + "px");
                 })
-                .on("mouseout", function(d) {
+                .on("mouseout", function() {
                     tooltip.transition()
                         .duration(500)
                         .style("opacity", 0);
-                })
-                .transition() // Add transition for the bars
-                .duration(1000)
-                .attr("width", d => x(d.Rank));
+                });
         }
     });
 </script>

@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/Usuario/UsuarioService.java
 package com.example.demo.Usuario;
 
 import com.example.demo.IQ.IQDataService;
@@ -66,5 +67,10 @@ public class UsuarioService {
 
     public void deleteUsuario(Integer id) {
         usuarioRepository.deleteById(id);
+    }
+
+    public Usuario registerUsuario(String nombre, String contraseña) {
+        Usuario newUser = new Usuario(nombre, contraseña, false);
+        return usuarioRepository.save(newUser);
     }
 }

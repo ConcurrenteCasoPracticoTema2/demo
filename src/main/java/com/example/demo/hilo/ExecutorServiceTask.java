@@ -28,6 +28,13 @@ public class ExecutorServiceTask {
     @Autowired
     private ExecutorService fixedThreadPool2;
 
+    @Autowired
+    private ExecutorService fixedThreadPool3;
+
+    @Autowired
+    private ExecutorService fixedThreadPool4;
+
+
     // Semáforo para controlar acceso a los datos entre hilos
     Semaphore semaphore = new Semaphore(1);
 
@@ -93,7 +100,7 @@ public class ExecutorServiceTask {
         CountDownLatch latch = new CountDownLatch(iqDataList.size());
 
         while (index.get() < iqDataList.size()) {
-            fixedThreadPool2.submit(() -> {
+            fixedThreadPool3.submit(() -> {
                 try {
                     semaphore.acquire();
 
@@ -130,7 +137,7 @@ public class ExecutorServiceTask {
         CountDownLatch latch = new CountDownLatch(iqDataList.size());
 
         while (index.get() < iqDataList.size()) {
-            fixedThreadPool2.submit(() -> {
+            fixedThreadPool4.submit(() -> {
                 try {
                     semaphore.acquire();
 
@@ -160,20 +167,42 @@ public class ExecutorServiceTask {
             emitter.completeWithError(e);
         }
     }
-
-    /**
-     * Método auxiliar que imprime los países asociados a los IQData, ejecutado en paralelo.
-     * No utiliza SSE, solo imprime en consola.
-     */
-    public void printCountries() {
+    public void printCountriesIQAndAdditionalDataWithEmitter(SseEmitter emitter) {
         List<IQData> iqDataList = iqDataRepository.findAll();
-        for (IQData iqData : iqDataList) {
+        AtomicInteger index = new AtomicInteger(0);
+        CountDownLatch latch = new CountDownLatch(iqDataList.size());
+
+        while (index.get() < iqDataList.size()) {
             fixedThreadPool.submit(() -> {
-                System.out.println(Thread.currentThread().getName() + " - Country: " + iqData.getCountry());
+                try {
+                    semaphore.acquire();
+
+                    if (index.get() < iqDataList.size()) {
+                        IQData iqData = iqDataList.get(index.getAndIncrement());
+                        String threadName = Thread.currentThread().getName();
+                        String iqDataInfo = "{\"Country\": \"" + iqData.getCountry() + "\", \"EducationExpenditure\": " + iqData.getEducationExpenditure() + ", \"AvgIncome\": " + iqData.getAvgIncome() + ", \"Thread\": \"" + threadName + "\"}";
+                        emitter.send(iqDataInfo);
+                        System.out.println(iqDataInfo);
+                    }
+
+                    semaphore.release();
+                    Thread.sleep(100);
+
+                } catch (Exception e) {
+                    emitter.completeWithError(e);
+                } finally {
+                    latch.countDown();
+                }
             });
         }
-    }
 
+        try {
+            latch.await();
+            emitter.complete();
+        } catch (InterruptedException e) {
+            emitter.completeWithError(e);
+        }
+    }
     /**
      * Método para cerrar los ejecutores cuando sea necesario.
      * Debe ser invocado para liberar recursos.
@@ -181,5 +210,7 @@ public class ExecutorServiceTask {
     public void shutdownExecutors() {
         fixedThreadPool.shutdown();
         fixedThreadPool2.shutdown();
+        fixedThreadPool3.shutdown();
+        fixedThreadPool4.shutdown();
     }
 }

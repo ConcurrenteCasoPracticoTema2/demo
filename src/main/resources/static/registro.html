@@ -24,8 +24,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 900px; /* Aumentar el ancho del cuadro */
-            height: 500px; /* Aumentar la altura del cuadro */
+            width: 900px;
+            height: 500px;
             text-align: center;
             display: flex;
             color: white;
@@ -33,7 +33,7 @@
         }
 
         .info {
-            width: 40%; /* Ajustar el ancho de la sección de información */
+            width: 40%;
             background: rgba(20, 20, 20, .8);
             padding: 30px 0;
             border-right: 5px solid rgba(30, 30, 30, .8);
@@ -55,7 +55,7 @@
         }
 
         .signupForm {
-            width: 60%; /* Ajustar el ancho del formulario */
+            width: 60%;
             padding: 30px 0;
             background: rgba(20, 40, 40, .8);
             transition: .2s;
@@ -69,7 +69,7 @@
             margin: 15px 0;
             font-size: 16px;
             padding: 10px;
-            width: 300px; /* Aumentar el ancho de los inputs */
+            width: 300px;
             border: 1px solid rgba(10, 180, 180, 1);
             border-top: none;
             border-left: none;
@@ -106,24 +106,45 @@
             align-items: center;
         }
     </style>
+    <script>
+        function redirectToLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Error al registrarse');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Error al registrarse');
+            });
+        }
+    </script>
 </head>
 <body>
-    <div class="signupSection">
-        <div class="info">
-            <h2>Bienvenido</h2>
-            <p>Por favor, regístrate para continuar.</p>
-            <div class="icon">&#129504;</div>
-        </div>
-        <div class="signupForm">
-            <h2>Registrate</h2>
-            <form action="/menu/register" method="post">
-                <div class="formContainer">
-                    <input type="text" id="newNombre" name="nombre" class="inputFields" placeholder="Nombre de usuario" required>
-                    <input type="password" id="newContraseña" name="contraseña" class="inputFields" placeholder="Contraseña" required>
-                    <button type="submit" class="btn">Registrarse</button>
-                </div>
-            </form>
-        </div>
+<div class="signupSection">
+    <div class="info">
+        <h2>Bienvenido</h2>
+        <p>Por favor, regístrate para continuar.</p>
+        <div class="icon">&#129504;</div>
     </div>
+    <div class="signupForm">
+        <h2>Registrate</h2>
+        <form action="/usuarios/register" method="post" onsubmit="redirectToLogin(event)">
+            <div class="formContainer">
+                <input type="text" id="newNombre" name="nombre" class="inputFields" placeholder="Nombre de usuario" required>
+                <input type="password" id="newContraseña" name="contraseña" class="inputFields" placeholder="Contraseña" required>
+                <button type="submit" class="btn">Registrarse</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

@@ -12,7 +12,7 @@ public class ExecutorServiceConfig {
 
     @Bean(name = "fixedThreadPool")
     public ExecutorService fixedThreadPool() {
-        return Executors.newFixedThreadPool(5);  // Crea un pool fijo de 5 hilos
+        return Executors.newFixedThreadPool(8);  // Crea un pool fijo de 8 hilos
     }
     @Bean(name = "fixedThreadPool2") // pull que no se ha comiteado
     public ExecutorService fixedThreadPool2() {
@@ -26,6 +26,16 @@ public class ExecutorServiceConfig {
 
     @Bean(name = "customThreadPool")
     public ExecutorService customThreadPool() {
-        return Executors.newCachedThreadPool();  // Crea un pool de hilos según demanda
+        return Executors.newCachedThreadPool();  // Crea un pool de hilos segÃºn demanda
+    }
+
+    @Bean(name = "fixedThreadPool3") // pull que no se ha comiteado
+    public ExecutorService fixedThreadPool3() {
+        return Executors.newFixedThreadPool(8); // Crea un pool fijo de 5 hilos
+    }
+
+    @Bean(name = "fixedThreadPool4") // pull que no se ha comiteado
+    public ExecutorService fixedThreadPool4() {
+        return Executors.newFixedThreadPool(8); // Crea un pool fijo de 5 hilos
     }
 }

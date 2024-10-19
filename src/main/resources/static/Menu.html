@@ -12,10 +12,21 @@
         }
 
         body {
-            margin: 15px;
-            padding: 15px;
+            margin: 0;
+            padding: 0;
             background: #111;
             background-repeat: no-repeat;
+            /* overflow: hidden;  Evita el scroll */
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            opacity: 0.1; /* Ajusta este valor para cambiar la transparencia */
         }
 
         .info h2 {
@@ -53,6 +64,7 @@
             color: white;
             outline: none;
             border-radius: 5px;
+            position: sticky;
         }
 
         .buttonContainer {
@@ -60,10 +72,18 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: #121315; /* Asegura que el fondo sea consistente */
+            z-index: 1; /* Asegura que los botones estén por encima de otros elementos */
         }
 
         .iqData {
             color: white; /* Asegura que el texto sea blanco */
+        }
+
+        .stopThreadsButton {
+            background-color: #974444; /* Fondo rojizo */
         }
     </style>
     <script>
@@ -103,12 +123,36 @@
                 isStreaming = true;
             }
         }
+
+        function stopThreads() {
+            fetch('/shutdown-executors', {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Hilos detenidos");
+                    } else {
+                        alert("Error al detener los hilos");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Error al detener los hilos");
+                });
+        }
     </script>
 </head>
 <body>
-    <div class="buttonContainer">
-        <button class="inputFields" onclick="startIQDataStream()">Iniciar/Detener Stream de IQ Data</button>
-        <button class="inputFields" onclick="window.location.href='countries-ranks.html'">Ver Countries and Ranks</button>
-    </div>
+<video autoplay muted loop class="video-background">
+    <source src="video/background.mp4" type="video/mp4">
+    Tu navegador no soporta el elemento de video.
+</video>
+<div class="buttonContainer">
+    <button class="inputFields" onclick="startIQDataStream()">Iniciar/Detener Stream de IQ Data</button>
+    <button class="inputFields" onclick="window.location.href='countries-ranks.html'">Ver Countries and Ranks</button>
+    <button class="inputFields" onclick="window.location.href='scatter_plot.html'">Ver Scatter Plot</button>
+    <button class="inputFields" onclick="window.location.href='countries-iq-additional.html'">Ver Countries IQ Additional</button>
+    <button class="inputFields stopThreadsButton" onclick="stopThreads()">Para Hilos</button>
+</div>
 </body>
 </html>
