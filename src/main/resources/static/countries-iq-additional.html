@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countries IQ Additional Data Line Charts</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .chart {
+            display: inline-block;
+            width: 98%; /* Increased width */
+            margin: 2%;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: auto;
+            height: auto;
+            padding: 5px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Countries IQ Additional Data Line Charts</h1>
+    <div class="button-container">
+        <button id="btn1">Show Education Expenditure</button>
+        <button id="btn2">Show Average Income</button>
+    </div>
+    <div id="chart" class="chart"></div>
+    <div id="tooltip" class="tooltip" style="opacity:0;"></div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const eventSource = new EventSource('/countries-iq-additional/stream');
+            const data = [];
+            let currentChart = 'education';
+
+            eventSource.onmessage = function(event) {
+                const parsedData = JSON.parse(event.data);
+                data.push(parsedData);
+                createLineChart(data, currentChart);
+            };
+
+            eventSource.onerror = function() {
+                console.log("Error in SSE connection.");
+                eventSource.close();
+            };
+
+            document.getElementById('btn1').addEventListener('click', function() {
+                currentChart = 'education';
+                createLineChart(data, currentChart);
+            });
+
+            document.getElementById('btn2').addEventListener('click', function() {
+                currentChart = 'income';
+                createLineChart(data, currentChart);
+            });
+
+            function createLineChart(data, chartType) {
+                // Clear any existing SVG elements
+                d3.select("#chart").selectAll("*").remove();
+
+                // Set dimensions and margins for the chart
+                const margin = { top: 20, right: 30, bottom: 100, left: 70 }; // Increased bottom margin
+                const width = 1600 - margin.left - margin.right; // Increased width
+                const height = 800 - margin.top - margin.bottom; // Increased height
+
+                // Create scales
+                const x = d3.scalePoint()
+                    .domain(data.map(d => d.Country))
+                    .range([0, width])
+                    .padding(0.5);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => chartType === 'education' ? d.EducationExpenditure : d.AvgIncome)])
+                    .range([height, 0]);
+
+                // Create line generator
+                const line = d3.line()
+                    .x(d => x(d.Country))
+                    .y(d => y(chartType === 'education' ? d.EducationExpenditure : d.AvgIncome));
+
+                // Tooltip
+                const tooltip = d3.select("#tooltip");
+
+                // Create the line chart
+                const svg = d3.select("#chart").append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
+
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                const path = svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", line);
+
+                // Add transition for the line chart
+                const totalLength = path.node().getTotalLength();
+
+                path
+                    .attr("stroke-dasharray", totalLength + " " + totalLength)
+                    .attr("stroke-dashoffset", totalLength)
+                    .transition()
+                    .duration(3000) // Slower transition
+                    .ease(d3.easeLinear)
+                    .attr("stroke-dashoffset", 0);
+
+                // Add circles for each data point
+                svg.selectAll("circle")
+                    .data(data)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", d => x(d.Country))
+                    .attr("cy", d => y(chartType === 'education' ? d.EducationExpenditure : d.AvgIncome))
+                    .attr("r", 5)
+                    .attr("fill", "transparent")
+                    .attr("stroke", "none")
+                    .on("mouseover", function(event, d) {
+                        tooltip.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                        tooltip.html(`Country: ${d.Country}<br/>Education Expenditure: ${d.EducationExpenditure}<br/>Average Income: ${d.AvgIncome}<br/>Thread: ${d.Thread}`)
+                            .style("left", (event.pageX + 5) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", function() {
+                        tooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

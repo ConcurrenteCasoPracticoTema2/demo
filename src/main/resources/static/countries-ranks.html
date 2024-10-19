@@ -95,7 +95,7 @@
                     .append("rect")
                     .attr("x", x(0))
                     .attr("y", (d, i) => y(i))
-                    .attr("width", d => x(d.Rank))
+                    .attr("width", 0) // Start with width 0 for animation
                     .attr("height", y.bandwidth())
                     .attr("class", "bar")
                     .on("mouseover", function(event, d) {
@@ -110,7 +110,10 @@
                         tooltip.transition()
                             .duration(500)
                             .style("opacity", 0);
-                    });
+                    })
+                    .transition() // Add transition for the bars
+                    .duration(1000)
+                    .attr("width", d => x(d.Rank));
             }
         });
     </script>

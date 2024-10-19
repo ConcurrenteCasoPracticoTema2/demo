@@ -180,7 +180,7 @@ public void printCountriesIQAndAdditionalDataWithEmitter(SseEmitter emitter) {
                 if (index.get() < iqDataList.size()) {
                     IQData iqData = iqDataList.get(index.getAndIncrement());
                     String threadName = Thread.currentThread().getName();
-                    String iqDataInfo = "{\"Country\": \"" + iqData.getCountry() + "\", \"IQ\": " + iqData.getIQ() + ", \"AvgTemp\": " + iqData.getAvgTemp() + ", \"EducationExpenditure\": " + iqData.getEducationExpenditure() + ", \"AvgIncome\": " + iqData.getAvgIncome() + ", \"Thread\": \"" + threadName + "\"}";
+                    String iqDataInfo = "{\"Country\": \"" + iqData.getCountry() + "\", \"EducationExpenditure\": " + iqData.getEducationExpenditure() + ", \"AvgIncome\": " + iqData.getAvgIncome() + ", \"Thread\": \"" + threadName + "\"}";
                     emitter.send(iqDataInfo);
                     System.out.println(iqDataInfo);
                 }
