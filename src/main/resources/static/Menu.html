@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <script>
+        function startIQDataStream() {
+            const eventSource = new EventSource('/iqdata/stream');
+
+            eventSource.onmessage = function(event) {
+                const iqData = event.data;
+
+                // Crear un nuevo elemento de párrafo para mostrar los datos
+                const p = document.createElement("p");
+                p.textContent = iqData;
+
+                // Agregar los datos al cuerpo de la página
+                document.body.appendChild(p);
+            };
+
+            eventSource.onerror = function() {
+                console.log("Error in SSE connection.");
+                eventSource.close();
+            };
+        }
+    </script>
+</head>
+<body>
+    <button onclick="startIQDataStream()">Iniciar Stream de IQ Data</button>
+</body>
+</html>
